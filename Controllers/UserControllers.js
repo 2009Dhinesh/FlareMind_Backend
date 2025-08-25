@@ -72,6 +72,7 @@ const Login = async (req, res) => {
     if (!validPassword) {
       return res.status(401).json({ message: "Invalid password" });
     }
+
     const tokenPayload = {
       _id: validUser._id,
       firstname: validUser.firstname,
@@ -104,6 +105,8 @@ const Login = async (req, res) => {
 const logout = async (_req, res) => {
   return res.json({ success: true, message: "Logged out (remove token client-side)" });
 };
+
+
 
 // ================== Update Me ==================
 const updateMe = async (req, res) => {
@@ -140,6 +143,7 @@ const getAllUsers = async (_req, res) => {
 const getOtherUsers = async (req, res) => {
   try {
     const currentUserId = req.user._id;
+
     const users = await User.find({ _id: { $ne: currentUserId } }).select(
       "-password" 
     );
@@ -166,5 +170,3 @@ module.exports = {
   getAllUsers,
   getOtherUsers,
 };
-
-
