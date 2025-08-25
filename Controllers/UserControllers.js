@@ -162,9 +162,9 @@ module.exports = {
   Register,
   Login,
   logout,
-  me,
   updateMe,
   getAllUsers,
   getOtherUsers,
 };
+
 
