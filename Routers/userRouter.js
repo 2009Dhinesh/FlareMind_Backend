@@ -6,9 +6,9 @@ const  userMiddleware  = require('../Middleware/userMiddleware')
 router.post('/signup' , Register );
 router.post('/signin' , Login );
 router.post("/logout", logout);
-router.get("/me", userMiddleware, me);
 router.put("/me", userMiddleware, updateMe);
 router.get("/all", userMiddleware, getAllUsers);
 router.get("/others", userMiddleware, getOtherUsers);
+
 
 module.exports = router;
