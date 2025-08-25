@@ -10,6 +10,4 @@ router.put("/me", userMiddleware, updateMe);
 router.get("/all", userMiddleware, getAllUsers);
 router.get("/others", userMiddleware, getOtherUsers);
 
-
 module.exports = router;
-
