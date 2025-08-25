@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {Register, Login, logout, me , updateMe, getAllUsers, getOtherUsers} = require('../Controllers/UserControllers');
+const {Register, Login, logout, updateMe, getAllUsers, getOtherUsers} = require('../Controllers/UserControllers');
 const  userMiddleware  = require('../Middleware/userMiddleware')
 
 router.post('/signup' , Register );
@@ -12,3 +12,4 @@ router.get("/others", userMiddleware, getOtherUsers);
 
 
 module.exports = router;
+
