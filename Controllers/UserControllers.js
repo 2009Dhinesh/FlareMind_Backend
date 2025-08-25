@@ -55,7 +55,6 @@ const Login = async (req, res) => {
   try {
     console.log("Request body:", req.body);
 
-    // 🔍 Debug log for SECRET_KEY
     console.log("Loaded SECRET_KEY:", process.env.SECRET_KEY);
 
     const { email, password } = req.body;
@@ -73,8 +72,6 @@ const Login = async (req, res) => {
     if (!validPassword) {
       return res.status(401).json({ message: "Invalid password" });
     }
-
-    // ✅ make sure SECRET_KEY is consistent in .env
     const tokenPayload = {
       _id: validUser._id,
       firstname: validUser.firstname,
@@ -83,7 +80,6 @@ const Login = async (req, res) => {
       phnumber: validUser.phnumber,
     };
 
-    // 🔑 Using correct SECRET_KEY
     const token = jwt.sign(tokenPayload, process.env.SECRET_KEY, {
       expiresIn: "1h",
     });
@@ -107,11 +103,6 @@ const Login = async (req, res) => {
 // ================== Logout ==================
 const logout = async (_req, res) => {
   return res.json({ success: true, message: "Logged out (remove token client-side)" });
-};
-
-// ================== Me ==================
-const me = async (req, res) => {
-  return res.json({ success: true, user: req.user });
 };
 
 // ================== Update Me ==================
@@ -148,12 +139,9 @@ const getAllUsers = async (_req, res) => {
 // ================== Get Other Users ==================
 const getOtherUsers = async (req, res) => {
   try {
-    // `req.user` comes from userMiddleware after decoding token
     const currentUserId = req.user._id;
-
-    // Exclude the logged-in user
     const users = await User.find({ _id: { $ne: currentUserId } }).select(
-      "-password" // exclude password field
+      "-password" 
     );
 
     return res.status(200).json({
@@ -179,3 +167,4 @@ module.exports = {
   getAllUsers,
   getOtherUsers,
 };
+
