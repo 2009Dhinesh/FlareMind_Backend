@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const DB = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_DB);
+        await mongoose.connect(process.env.MONGO_URI);
         console.log("MongoDB Connected...");
     } catch (err) {
         console.error("MongoDB Connection Failed:", err.message);
@@ -10,3 +10,4 @@ const DB = async () => {
 };
 
 module.exports = DB;
+
