@@ -55,6 +55,7 @@ const Login = async (req, res) => {
   try {
     console.log("Request body:", req.body);
 
+    // 🔍 Debug log for SECRET_KEY
     console.log("Loaded SECRET_KEY:", process.env.SECRET_KEY);
 
     const { email, password } = req.body;
@@ -73,6 +74,7 @@ const Login = async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
+    // ✅ make sure SECRET_KEY is consistent in .env
     const tokenPayload = {
       _id: validUser._id,
       firstname: validUser.firstname,
@@ -81,6 +83,7 @@ const Login = async (req, res) => {
       phnumber: validUser.phnumber,
     };
 
+    // 🔑 Using correct SECRET_KEY
     const token = jwt.sign(tokenPayload, process.env.SECRET_KEY, {
       expiresIn: "1h",
     });
@@ -106,29 +109,76 @@ const logout = async (_req, res) => {
   return res.json({ success: true, message: "Logged out (remove token client-side)" });
 };
 
+// ==================  Me ==================
 
+const me = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password'); 
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
+    res.json({
+      message: 'User profile fetched successfully',
+      user
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
 // ================== Update Me ==================
+
 const updateMe = async (req, res) => {
   try {
+
     const allowed = ["firstname", "lastname", "phnumber", "email"];
     const updates = {};
 
     for (const key of allowed) {
-      if (req.body[key] !== undefined) updates[key] = req.body[key];
+      if (req.body[key] !== undefined) {
+        updates[key] = req.body[key].trim();
+      }
     }
 
-    const updated = await User.findByIdAndUpdate(req.user._id, updates, {
-      new: true,
-      runValidators: true,
-      select: "-password",
-    });
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid fields provided for update",
+      });
+    }
 
-    return res.json({ success: true, user: updated });
-  } catch {
-    return res.status(500).json({ success: false, message: "Server error" });
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized - user not logged in",
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, {
+      new: true, 
+      runValidators: true,
+    }).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error("Update error:", err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while updating user",
+    });
   }
 };
+
+
 
 // ================== Get All Users ==================
 const getAllUsers = async (_req, res) => {
@@ -142,6 +192,7 @@ const getAllUsers = async (_req, res) => {
 // ================== Get Other Users ==================
 const getOtherUsers = async (req, res) => {
   try {
+
     const currentUserId = req.user._id;
 
     const users = await User.find({ _id: { $ne: currentUserId } }).select(
@@ -166,6 +217,7 @@ module.exports = {
   Register,
   Login,
   logout,
+  me,
   updateMe,
   getAllUsers,
   getOtherUsers,
