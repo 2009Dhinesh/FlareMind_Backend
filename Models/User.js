@@ -22,7 +22,9 @@ const UserSchema = new mongoose.Schema({
         type : String,
         required : true,
         unique: true,
-        lowercase: true
+        lowercase: true,
+        match:[/^\S+@\S+\.\S+$/ , "Please email is require to example@gmail.com"]
+
     },
     password : {
         type : String ,
